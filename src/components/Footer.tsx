@@ -1,39 +1,8 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isReducedMotion, setIsReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setIsReducedMotion(mediaQuery.matches);
-
-    if (videoRef.current) {
-      if (mediaQuery.matches) {
-        videoRef.current.autoplay = false;
-        videoRef.current.pause();
-      } else {
-        videoRef.current.muted = true;
-        videoRef.current.play().catch(() => {});
-      }
-    }
-
-    const handleMotionChange = (e: MediaQueryListEvent) => {
-      setIsReducedMotion(e.matches);
-      if (videoRef.current) {
-        if (e.matches) {
-          videoRef.current.pause();
-        } else {
-          videoRef.current.play().catch(() => {});
-        }
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleMotionChange);
-    return () => mediaQuery.removeEventListener('change', handleMotionChange);
-  }, []);
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -85,27 +54,23 @@ export const Footer: React.FC = () => {
         </p>
       </div>
 
-      {/* Engraved illustration video - Sized to normal proportion and centered, framed purely on the horse cart */}
+      {/* Engraved illustration - Sized to normal proportion and centered, locally hosted animated WebP */}
       <div className="w-full relative mt-2 sm:mt-3 flex justify-center pointer-events-none select-none overflow-hidden">
-        <div className="w-full h-[100px] sm:h-[115px] md:h-[130px] lg:h-[140px] relative overflow-hidden flex items-center justify-center">
-          <video
-            ref={videoRef}
-            autoPlay={!isReducedMotion}
-            loop
-            muted
-            playsInline
-            preload="auto"
-            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260928_144832_2b6b23aa-4416-4fcb-9df4-132349c59edc.mp4"
-            className="w-full h-full object-cover scale-[0.62] sm:scale-[0.56] md:scale-[0.50] lg:scale-[0.46]"
-            style={{
-              filter: 'invert(1) brightness(0.85) contrast(1.15)',
-              mixBlendMode: 'screen',
-              objectPosition: '50% 52%',
-              opacity: 0.85,
-            }}
-            aria-hidden="true"
-            tabIndex={-1}
-          />
+        <div className="w-full h-[95px] sm:h-[110px] md:h-[125px] lg:h-[135px] relative overflow-hidden flex items-center justify-center">
+          <picture className="w-full h-full flex items-center justify-center">
+            <source type="image/webp" srcSet="/images/horse-cart.webp" />
+            <img
+              src="/images/horse-cart.webp"
+              alt="Vintage engraved horse-drawn carriage galloping"
+              className="w-full h-full object-contain max-w-[520px] sm:max-w-[650px] md:max-w-[780px]"
+              style={{
+                filter: 'invert(1) brightness(0.85) contrast(1.15)',
+                mixBlendMode: 'screen',
+                opacity: 0.85,
+              }}
+              loading="eager"
+            />
+          </picture>
         </div>
       </div>
     </footer>
