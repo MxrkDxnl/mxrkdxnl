@@ -10,7 +10,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { FadeIn } from '../components/FadeIn';
-import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { usePortfolio } from '../context/PortfolioContext';
 import type { ProjectItem } from '../data/portfolioData';
 
 type CategoryFilter =
@@ -20,6 +20,7 @@ type CategoryFilter =
   | 'Web & Software Architecture';
 
 export const ProjectsPage: React.FC = () => {
+  const { data: PORTFOLIO_DATA } = usePortfolio();
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('All');
 
   const categories: { label: CategoryFilter; count: number }[] = [
@@ -52,8 +53,8 @@ export const ProjectsPage: React.FC = () => {
   return (
     <div className="w-full pt-28 pb-20 sm:pb-24 px-4 sm:px-6 md:px-10 bg-[#0C0C0C]">
       <div className="max-w-5xl mx-auto flex flex-col gap-10 sm:gap-14">
-        {/* Header */}
-        <div>
+        {/* Header & Filters Section */}
+        <section data-section-id="sec-projects-header" className="flex flex-col gap-6">
           <FadeIn delay={0} y={30}>
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] sm:text-xs uppercase tracking-widest text-[#BBCCD7] mb-3">
               <Shield size={13} className="text-emerald-400" />
@@ -66,39 +67,39 @@ export const ProjectsPage: React.FC = () => {
               Applied cybersecurity investigations, packet-level network analysis, multi-AZ cloud architecture, and web systems developed through academic research at Staffordshire University and Edith Cowan University.
             </p>
           </FadeIn>
-        </div>
 
-        {/* Category Filters */}
-        <FadeIn delay={0.08} y={15}>
-          <div className="flex flex-wrap gap-2 pt-1 border-b border-white/10 pb-4">
-            {categories.map((cat) => {
-              const isSelected = selectedCategory === cat.label;
-              return (
-                <button
-                  key={cat.label}
-                  onClick={() => setSelectedCategory(cat.label)}
-                  className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-wider transition-all flex items-center gap-2 min-h-[40px] cursor-pointer ${
-                    isSelected
-                      ? 'bg-white text-black shadow-lg font-semibold'
-                      : 'bg-white/5 text-[#D7E2EA]/70 hover:bg-white/10 hover:text-white border border-white/10'
-                  }`}
-                >
-                  <span>{cat.label}</span>
-                  <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                      isSelected ? 'bg-black/15 text-black' : 'bg-white/10 text-[#D7E2EA]/60'
+          {/* Category Filters */}
+          <FadeIn delay={0.08} y={15}>
+            <div className="flex flex-wrap gap-2 pt-1 border-b border-white/10 pb-4">
+              {categories.map((cat) => {
+                const isSelected = selectedCategory === cat.label;
+                return (
+                  <button
+                    key={cat.label}
+                    onClick={() => setSelectedCategory(cat.label)}
+                    className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-wider transition-all flex items-center gap-2 min-h-[40px] cursor-pointer ${
+                      isSelected
+                        ? 'bg-white text-black shadow-lg font-semibold'
+                        : 'bg-white/5 text-[#D7E2EA]/70 hover:bg-white/10 hover:text-white border border-white/10'
                     }`}
                   >
-                    {cat.count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </FadeIn>
+                    <span>{cat.label}</span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                        isSelected ? 'bg-black/15 text-black' : 'bg-white/10 text-[#D7E2EA]/60'
+                      }`}
+                    >
+                      {cat.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </FadeIn>
+        </section>
 
         {/* Projects Cards List */}
-        <div className="flex flex-col gap-8 sm:gap-10">
+        <section data-section-id="sec-projects-list" className="flex flex-col gap-8 sm:gap-10">
           {filteredProjects.map((project, idx) => (
             <FadeIn key={project.id} delay={idx * 0.08} y={20}>
               <div className="bg-[#141416] border-2 border-[#D7E2EA]/25 hover:border-[#D7E2EA]/50 rounded-[28px] sm:rounded-[36px] p-6 sm:p-10 shadow-2xl relative overflow-hidden transition-all duration-300 group">
@@ -246,7 +247,7 @@ export const ProjectsPage: React.FC = () => {
               </div>
             </FadeIn>
           ))}
-        </div>
+        </section>
 
         {/* Academic Foundation Verification Notice */}
         <div className="p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-white/[0.02] border border-white/10 text-center flex flex-col items-center">

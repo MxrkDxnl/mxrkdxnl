@@ -922,11 +922,11 @@ export const PORTFOLIO_DATA = {
   },
 
   contact: {
-    primaryEmail: 'Mark@MxrkDxnl.Com',
+    primaryEmail: 'mark@mxrkdxnl.com',
     phone: '+94 77 803 4343',
     location: 'Negombo, Sri Lanka',
     inboxes: [
-      { label: 'Primary Domain Email', address: 'Mark@MxrkDxnl.Com', type: 'Primary' },
+      { label: 'Primary Domain Email', address: 'mark@mxrkdxnl.com', type: 'Primary' },
       { label: 'Gmail', address: 'ferddanmark@gmail.com', type: 'Personal' },
       { label: 'Hotmail', address: 'mxrk.dxnl@hotmail.com', type: 'Secondary' },
       { label: 'Squirrel Mail (.Onion)', address: 'mxrk@morke.ru', type: 'Encrypted / Onion' },

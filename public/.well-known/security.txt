@@ -1,7 +1,7 @@
 # Security Contact Information for Mark Daniel (MXRKDXNL)
 # Specification: RFC 9116 (https://www.rfc-editor.org/rfc/rfc9116)
 
-Contact: mailto:markdaniel693@gmail.com
+Contact: mailto:mark@mxrkdxnl.com
 Expires: 2027-12-31T23:59:59.000Z
 Preferred-Languages: en
 Canonical: https://mxrkdxnl.com/.well-known/security.txt

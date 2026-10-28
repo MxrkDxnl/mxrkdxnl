@@ -1,66 +1,101 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Mail, ArrowUpRight, Download, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { FadeIn } from '../components/FadeIn';
-import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { usePortfolio } from '../context/PortfolioContext';
 import { SocialLogo, InboxLogo } from '../components/ServiceLogos';
 
 export const ContactPage: React.FC = () => {
+  const { data: PORTFOLIO_DATA } = usePortfolio();
   const contact = PORTFOLIO_DATA.contact;
+  const navigate = useNavigate();
+  const clickCountRef = useRef(0);
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+    };
+  }, []);
+
+  const handleOTrigger = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    clickCountRef.current += 1;
+
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+    }
+
+    if (clickCountRef.current >= 3) {
+      clickCountRef.current = 0;
+      navigate('/operator');
+    } else {
+      clickTimerRef.current = setTimeout(() => {
+        clickCountRef.current = 0;
+      }, 1500);
+    }
+  };
 
   return (
     <div className="w-full pt-28 pb-20 sm:pb-24 px-4 sm:px-6 md:px-10 bg-[#0C0C0C]">
       <div className="max-w-4xl mx-auto flex flex-col gap-10 sm:gap-14">
-        {/* Header */}
-        <div>
-          <FadeIn delay={0} y={30}>
-            <span className="text-xs uppercase tracking-widest text-[#BBCCD7] font-semibold block mb-3">
-              Direct Inquiries & Opportunities
-            </span>
-            <h1 className="hero-heading text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-none mb-4 sm:mb-6">
-              Contact Mark Daniel
-            </h1>
-            <p className="text-sm sm:text-lg text-[#D7E2EA]/75 font-light max-w-2xl leading-relaxed">
-              Open to entry-level Cybersecurity Analyst, Junior SOC Analyst, and SOC Intern roles. All direct inboxes, verified channels, and downloadable credentials are listed below.
-            </p>
-          </FadeIn>
-        </div>
-
-        {/* Primary Contact Card: Direct Email */}
-        <FadeIn delay={0.1} y={20}>
-          <div className="bg-[#141416] border-2 border-[#D7E2EA]/30 rounded-[28px] sm:rounded-[36px] p-6 sm:p-12 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <div className="flex items-start sm:items-center gap-3.5 sm:gap-5 min-w-0">
-              <InboxLogo label="Primary Domain" address={contact.primaryEmail} />
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-emerald-400 font-semibold mb-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
-                  <span>Primary Email Channel</span>
-                </div>
-                <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-white mb-2 break-all">
-                  {contact.primaryEmail}
-                </h2>
-                <p className="text-xs sm:text-sm text-[#D7E2EA]/70 font-light">
-                  Direct mailbox monitored for career opportunities, SOC internships, and academic inquiries.
-                </p>
-              </div>
-            </div>
-
-            <a
-              href={`mailto:${contact.primaryEmail}`}
-              className="rounded-full text-white font-medium uppercase tracking-widest px-8 py-3.5 text-xs sm:text-sm flex items-center justify-center gap-2 hover:brightness-110 transition-all w-full sm:w-auto text-center shrink-0 shadow-lg"
-              style={{
-                background: 'linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%)',
-                outline: '2px solid #FFFFFF',
-                outlineOffset: '-3px',
-              }}
-            >
-              <Mail size={16} />
-              <span>Send Email</span>
-            </a>
+        {/* Header & Primary Contact */}
+        <section data-section-id="sec-contact-header" className="flex flex-col gap-10">
+          <div>
+            <FadeIn delay={0} y={30}>
+              <span className="text-xs uppercase tracking-widest text-[#BBCCD7] font-semibold block mb-3">
+                Direct Inquiries & Opportunities
+              </span>
+              <h1 className="hero-heading text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-none mb-4 sm:mb-6">
+                C<span
+                  onClick={handleOTrigger}
+                  style={{ cursor: 'inherit', userSelect: 'none' }}
+                  className="select-none"
+                >O</span>NTACT MARK DANIEL
+              </h1>
+              <p className="text-sm sm:text-lg text-[#D7E2EA]/75 font-light max-w-2xl leading-relaxed">
+                Open to entry-level Cybersecurity Analyst, Junior SOC Analyst, and SOC Intern roles. All direct inboxes, verified channels, and downloadable credentials are listed below.
+              </p>
+            </FadeIn>
           </div>
-        </FadeIn>
+
+          {/* Primary Contact Card: Direct Email */}
+          <FadeIn delay={0.1} y={20}>
+            <div className="bg-[#141416] border-2 border-[#D7E2EA]/30 rounded-[28px] sm:rounded-[36px] p-6 sm:p-12 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+              <div className="flex items-start sm:items-center gap-3.5 sm:gap-5 min-w-0">
+                <InboxLogo label="Primary Domain" address={contact.primaryEmail} />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-emerald-400 font-semibold mb-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
+                    <span>Primary Email Channel</span>
+                  </div>
+                  <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-white mb-2 break-all">
+                    {contact.primaryEmail}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-[#D7E2EA]/70 font-light">
+                    Direct mailbox monitored for career opportunities, SOC internships, and academic inquiries.
+                  </p>
+                </div>
+              </div>
+
+              <a
+                href={`mailto:${contact.primaryEmail}`}
+                className="rounded-full text-white font-medium uppercase tracking-widest px-8 py-3.5 text-xs sm:text-sm flex items-center justify-center gap-2 hover:brightness-110 transition-all w-full sm:w-auto text-center shrink-0 shadow-lg"
+                style={{
+                  background: 'linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%)',
+                  outline: '2px solid #FFFFFF',
+                  outlineOffset: '-3px',
+                }}
+              >
+                <Mail size={16} />
+                <span>Send Email</span>
+              </a>
+            </div>
+          </FadeIn>
+        </section>
 
         {/* Available Inboxes Grid */}
-        <section>
+        <section data-section-id="sec-contact-inboxes">
           <FadeIn delay={0.15} y={20}>
             <h3 className="text-sm uppercase tracking-widest text-[#BBCCD7] font-semibold mb-4">
               All Available Email Inboxes
@@ -96,7 +131,7 @@ export const ContactPage: React.FC = () => {
         </section>
 
         {/* Verified Social & Professional Channels */}
-        <section>
+        <section data-section-id="sec-contact-socials">
           <FadeIn delay={0.2} y={20}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm uppercase tracking-widest text-[#BBCCD7] font-semibold">
@@ -144,38 +179,40 @@ export const ContactPage: React.FC = () => {
         </section>
 
         {/* Verified CV Download Card */}
-        <FadeIn delay={0.35} y={20}>
-          <div className="bg-white/5 border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-emerald-400 font-semibold mb-1">
-                <ShieldCheck size={16} />
-                <span>Verified Documentation</span>
+        <section data-section-id="sec-contact-cv">
+          <FadeIn delay={0.35} y={20}>
+            <div className="bg-white/5 border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+              <div>
+                <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-emerald-400 font-semibold mb-1">
+                  <ShieldCheck size={16} />
+                  <span>Verified Documentation</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold uppercase text-white mb-1.5">
+                  Download Official CV
+                </h3>
+                <p className="text-xs sm:text-sm text-[#D7E2EA]/70 font-light max-w-lg leading-relaxed">
+                  Complete resume detailing academic milestones at Staffordshire University & APIIT, hardware engineering experience, and technical core skills.
+                </p>
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold uppercase text-white mb-1.5">
-                Download Official CV
-              </h3>
-              <p className="text-xs sm:text-sm text-[#D7E2EA]/70 font-light max-w-lg leading-relaxed">
-                Complete resume detailing academic milestones at Staffordshire University & APIIT, hardware engineering experience, and technical core skills.
-              </p>
-            </div>
 
-            <a
-              href={contact.cv.url}
-              download={contact.cv.filename}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full text-white font-medium uppercase tracking-widest px-8 py-3.5 text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all duration-200 hover:scale-105 shadow-xl shrink-0 w-full sm:w-auto text-center"
-              style={{
-                background: 'linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%)',
-                outline: '2px solid #FFFFFF',
-                outlineOffset: '-3px',
-              }}
-            >
-              <Download size={16} />
-              <span>Download CV (PDF)</span>
-            </a>
-          </div>
-        </FadeIn>
+              <a
+                href={contact.cv.url}
+                download={contact.cv.filename}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full text-white font-medium uppercase tracking-widest px-8 py-3.5 text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all duration-200 hover:scale-105 shadow-xl shrink-0 w-full sm:w-auto text-center"
+                style={{
+                  background: 'linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%)',
+                  outline: '2px solid #FFFFFF',
+                  outlineOffset: '-3px',
+                }}
+              >
+                <Download size={16} />
+                <span>Download CV (PDF)</span>
+              </a>
+            </div>
+          </FadeIn>
+        </section>
       </div>
     </div>
   );

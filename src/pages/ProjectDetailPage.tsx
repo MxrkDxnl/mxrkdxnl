@@ -13,10 +13,11 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { FadeIn } from '../components/FadeIn';
-import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { usePortfolio } from '../context/PortfolioContext';
 import type { ProjectItem, ProjectScreenshot } from '../data/portfolioData';
 
 export const ProjectDetailPage: React.FC = () => {
+  const { data: PORTFOLIO_DATA } = usePortfolio();
   const { slug: paramSlug } = useParams<{ slug: string }>();
   const location = useLocation();
 

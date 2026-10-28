@@ -2,9 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Users, ShieldCheck, CheckCircle2, AlertTriangle, Layers, Code, FileText, Image as ImageIcon } from 'lucide-react';
 import { FadeIn } from '../components/FadeIn';
-import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { usePortfolio } from '../context/PortfolioContext';
 
 export const AltriumCaseStudyPage: React.FC = () => {
+  const { data: PORTFOLIO_DATA } = usePortfolio();
   const caseStudy = PORTFOLIO_DATA.altriumCaseStudy;
 
   return (

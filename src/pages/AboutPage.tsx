@@ -2,15 +2,16 @@ import React from 'react';
 import { GraduationCap, Briefcase, Wrench, Shield, CheckCircle, Download, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { FadeIn } from '../components/FadeIn';
-import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { usePortfolio } from '../context/PortfolioContext';
 import markPortrait from '../assets/mark-real-portrait.jpg';
 
 export const AboutPage: React.FC = () => {
+  const { data: PORTFOLIO_DATA } = usePortfolio();
   return (
     <div className="w-full pt-28 pb-20 sm:pb-24 px-4 sm:px-6 md:px-10 bg-[#0C0C0C]">
       <div className="max-w-5xl mx-auto flex flex-col gap-14 sm:gap-20">
         {/* Header / Intro */}
-        <section>
+        <section data-section-id="sec-about-profile">
           <FadeIn delay={0} y={30}>
             <span className="text-xs uppercase tracking-widest text-[#BBCCD7] font-semibold block mb-3">
               About Mark Daniel
@@ -114,7 +115,7 @@ export const AboutPage: React.FC = () => {
         </section>
 
         {/* Education Timeline with Campus Logos */}
-        <section>
+        <section data-section-id="sec-about-education">
           <FadeIn delay={0} y={30}>
             <div className="flex items-center gap-3 mb-6 sm:mb-8">
               <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
@@ -177,7 +178,7 @@ export const AboutPage: React.FC = () => {
         </section>
 
         {/* Work Experience (Most recent first) */}
-        <section>
+        <section data-section-id="sec-about-experience">
           <FadeIn delay={0} y={30}>
             <div className="flex items-center gap-3 mb-6 sm:mb-8">
               <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
@@ -223,7 +224,7 @@ export const AboutPage: React.FC = () => {
         </section>
 
         {/* Skills: Practical Foundation vs Developing Skills */}
-        <section>
+        <section data-section-id="sec-about-skills">
           <FadeIn delay={0} y={30}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
@@ -292,7 +293,7 @@ export const AboutPage: React.FC = () => {
         </section>
 
         {/* How I Work */}
-        <section>
+        <section data-section-id="sec-about-philosophy">
           <FadeIn delay={0} y={30}>
             <div className="flex items-center gap-3 mb-6 sm:mb-8">
               <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
@@ -322,7 +323,7 @@ export const AboutPage: React.FC = () => {
         </section>
 
         {/* Download CV Section - ACTIVATED WITH OFFICIAL PDF */}
-        <section className="bg-white/5 border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <section data-section-id="sec-about-cv" className="bg-white/5 border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-emerald-400 font-semibold mb-1">
               <CheckCircle2 size={15} />

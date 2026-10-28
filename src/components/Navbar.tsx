@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { Menu, X, Shield } from 'lucide-react';
-import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { usePortfolio } from '../context/PortfolioContext';
 
 export const Navbar: React.FC = () => {
+  const { data: PORTFOLIO_DATA } = usePortfolio();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [

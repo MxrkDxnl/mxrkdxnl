@@ -124,3 +124,43 @@ button, a, input, select, textarea {
   }
 }
 
+/* Liquid Glass Styling for Operator Environment */
+.liquid-glass {
+  position: relative;
+  background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+}
+
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.02) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Visual Editor Hover & Active Highlight */
+.ve-editable-hover {
+  outline: 1.5px dashed rgba(168, 85, 247, 0.6);
+  outline-offset: 3px;
+  border-radius: 4px;
+  cursor: text;
+  transition: outline 0.15s ease;
+}
+
+.ve-editable-active {
+  outline: 2px solid #00f5d4 !important;
+  outline-offset: 3px;
+  border-radius: 4px;
+  background-color: rgba(0, 245, 212, 0.08);
+}
+

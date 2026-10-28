@@ -1,16 +1,17 @@
 import React from 'react';
 import { FileText, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { FadeIn } from '../components/FadeIn';
-import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { usePortfolio } from '../context/PortfolioContext';
 
 export const LabsPage: React.FC = () => {
+  const { data: PORTFOLIO_DATA } = usePortfolio();
   const labs = PORTFOLIO_DATA.labs;
 
   return (
     <div className="w-full pt-28 pb-20 sm:pb-24 px-4 sm:px-6 md:px-10 bg-[#0C0C0C]">
       <div className="max-w-5xl mx-auto flex flex-col gap-10 sm:gap-14">
-        {/* Header */}
-        <div>
+        {/* Header & Policy */}
+        <section data-section-id="sec-labs-header" className="flex flex-col gap-6">
           <FadeIn delay={0} y={30}>
             <span className="text-xs uppercase tracking-widest text-[#BBCCD7] font-semibold block mb-3">
               Hands-On Exercises & Defensive Notes
@@ -22,20 +23,20 @@ export const LabsPage: React.FC = () => {
               {labs.intro}
             </p>
           </FadeIn>
-        </div>
 
-        {/* Documentation Policy Notice */}
-        <FadeIn delay={0.1} y={20}>
-          <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.03] border border-blue-500/30 flex items-start gap-3">
-            <AlertCircle size={20} className="text-blue-400 shrink-0 mt-0.5" />
-            <div className="text-xs sm:text-sm text-[#D7E2EA]/85 font-light leading-relaxed">
-              <strong>Publication Integrity Policy:</strong> Only verified, completed write-ups with defensible security insights are published here. Current exercises are maintained as structured drafts pending final confirmation of specific flags, logs, and defensive summaries.
+          {/* Documentation Policy Notice */}
+          <FadeIn delay={0.1} y={20}>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.03] border border-blue-500/30 flex items-start gap-3">
+              <AlertCircle size={20} className="text-blue-400 shrink-0 mt-0.5" />
+              <div className="text-xs sm:text-sm text-[#D7E2EA]/85 font-light leading-relaxed">
+                <strong>Publication Integrity Policy:</strong> Only verified, completed write-ups with defensible security insights are published here. Current exercises are maintained as structured drafts pending final confirmation of specific flags, logs, and defensive summaries.
+              </div>
             </div>
-          </div>
-        </FadeIn>
+          </FadeIn>
+        </section>
 
         {/* Lab Entries Listing */}
-        <div className="flex flex-col gap-6 sm:gap-8">
+        <section data-section-id="sec-labs-list" className="flex flex-col gap-6 sm:gap-8">
           {labs.knownActivities.map((entry, idx) => (
             <FadeIn key={entry.id} delay={idx * 0.15} y={20}>
               <div className="bg-[#141416] border border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 flex flex-col gap-4 sm:gap-5">
@@ -81,10 +82,10 @@ export const LabsPage: React.FC = () => {
               </div>
             </FadeIn>
           ))}
-        </div>
+        </section>
 
         {/* Future Write-up Schema Template */}
-        <section className="bg-[#141416] border border-white/10 rounded-3xl p-6 sm:p-8">
+        <section data-section-id="sec-labs-framework" className="bg-[#141416] border border-white/10 rounded-3xl p-6 sm:p-8">
           <div className="flex items-center gap-2.5 mb-4">
             <FileText size={18} className="text-[#BBCCD7]" />
             <h2 className="text-lg sm:text-xl font-bold uppercase text-white">

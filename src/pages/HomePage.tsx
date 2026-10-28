@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Terminal, Cpu, Network, FileText, CheckCircle2 } from 'lucide-react';
 import { FadeIn } from '../components/FadeIn';
 import { Magnet } from '../components/Magnet';
-import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { usePortfolio } from '../context/PortfolioContext';
 import markPortrait from '../assets/mark-portrait.png';
 
 export const HomePage: React.FC = () => {
+  const { data: PORTFOLIO_DATA } = usePortfolio();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -18,9 +19,9 @@ export const HomePage: React.FC = () => {
     }
   }, []);
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col">
       {/* 1. HERO SECTION */}
-      <section className="relative w-full min-h-screen flex flex-col justify-between overflow-x-clip bg-[#0C0C0C] pt-24 pb-12 sm:pb-20 px-4 sm:px-6 md:px-10">
+      <section data-section-id="sec-hero" className="relative w-full min-h-screen flex flex-col justify-between overflow-x-clip bg-[#0C0C0C] pt-24 pb-12 sm:pb-20 px-4 sm:px-6 md:px-10">
         {/* Top Tagline */}
         <div className="w-full flex justify-between items-center z-20">
           <FadeIn delay={0} y={-10} amount={0} margin="0px">
@@ -112,7 +113,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* VIDEO SECTION - ARRIVES AFTER 3-4 DELIBERATE SCROLLS, EMERGES WITH DRAMATIC CINEMATIC SCALE & BLUR-CLEAR */}
-      <section className="w-full px-3 sm:px-4 md:px-6 lg:px-8 pt-20 sm:pt-48 md:pt-60 lg:pt-72 pb-16 sm:pb-40 md:pb-52 bg-[#0C0C0C] border-t border-white/5 relative z-10">
+      <section data-section-id="sec-video" className="w-full px-3 sm:px-4 md:px-6 lg:px-8 pt-20 sm:pt-48 md:pt-60 lg:pt-72 pb-16 sm:pb-40 md:pb-52 bg-[#0C0C0C] border-t border-white/5 relative z-10">
         <div className="w-full max-w-[1720px] 2xl:max-w-[1920px] mx-auto flex flex-col items-center">
           <FadeIn
             delay={0.15}
@@ -161,7 +162,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 2. INTRODUCTION & BACKGROUND SUMMARY - ARRIVES AFTER 2-3 SCROLLS, EMERGES WITH DEPTH & BLUR-CLEAR */}
-      <section className="px-4 sm:px-6 md:px-10 py-20 sm:py-44 md:py-56 bg-[#111113] border-t border-b border-white/5">
+      <section data-section-id="sec-intro" className="px-4 sm:px-6 md:px-10 py-20 sm:py-44 md:py-56 bg-[#111113] border-t border-b border-white/5">
         <div className="max-w-5xl mx-auto">
           <FadeIn delay={0} y={60} scale={0.95} blur={10} duration={0.9} amount={0.25} margin="-60px 0px">
             <span className="text-xs uppercase tracking-widest text-[#BBCCD7] font-semibold block mb-3">
@@ -245,7 +246,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 3. CURRENT LEARNING FOCUS - ARRIVES AFTER 2-3 SCROLLS, EMERGES WITH STAGGERED REVEAL */}
-      <section className="px-4 sm:px-6 md:px-10 py-20 sm:py-44 md:py-56 bg-[#0C0C0C]">
+      <section data-section-id="sec-learning" className="px-4 sm:px-6 md:px-10 py-20 sm:py-44 md:py-56 bg-[#0C0C0C]">
         <div className="max-w-5xl mx-auto">
           <FadeIn delay={0} y={55} scale={0.95} blur={10} duration={0.9} amount={0.25} margin="-60px 0px">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8 sm:mb-12">
@@ -290,7 +291,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 4. FEATURED PROJECT TEASER - ARRIVES AFTER 2-3 SCROLLS, EMERGES WITH HEROIC SCALE & SHADOW */}
-      <section className="px-4 sm:px-6 md:px-10 py-20 sm:py-44 md:py-56 bg-[#141416] border-t border-b border-white/10">
+      <section data-section-id="sec-featured-project" className="px-4 sm:px-6 md:px-10 py-20 sm:py-44 md:py-56 bg-[#141416] border-t border-b border-white/10">
         <div className="max-w-5xl mx-auto">
           <FadeIn delay={0} y={55} scale={0.95} blur={10} duration={0.9} amount={0.25} margin="-60px 0px">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 sm:mb-10">
@@ -371,7 +372,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 5. LABS & LEARNING PREVIEW - ARRIVES AFTER 2-3 SCROLLS, EMERGES WITH STAGGERED ELEVATION */}
-      <section className="px-4 sm:px-6 md:px-10 py-20 sm:py-44 md:py-56 bg-[#0C0C0C]">
+      <section data-section-id="sec-labs-preview" className="px-4 sm:px-6 md:px-10 py-20 sm:py-44 md:py-56 bg-[#0C0C0C]">
         <div className="max-w-5xl mx-auto">
           <FadeIn delay={0} y={55} scale={0.95} blur={10} duration={0.9} amount={0.25} margin="-60px 0px">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8 sm:mb-10">
