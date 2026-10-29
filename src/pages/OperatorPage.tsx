@@ -266,7 +266,7 @@ export const OperatorPage: React.FC = () => {
     const cleanPass = passcode.trim();
 
     // Standard operator credentials
-    const expectedPasskey = import.meta.env.VITE_OPERATOR_PASSKEY || 'mxrkdxnl2026';
+    const expectedPasskey = import.meta.env.VITE_OPERATOR_PASSKEY || 'koko201903';
     const validIdentifiers = ['mxrkdxnl', 'mark', 'operator-01', 'operator', 'mark daniel', 'admin'];
 
     setTimeout(() => {
@@ -449,7 +449,7 @@ export const OperatorPage: React.FC = () => {
                           type="text"
                           value={operatorId}
                           onChange={(e) => setOperatorId(e.target.value)}
-                          placeholder="e.g. MXRKDXNL"
+                          placeholder="Callsign / Operator ID"
                           autoComplete="off"
                           className="w-full px-4 py-3 rounded-xl bg-black/60 border border-white/15 text-sm font-mono text-white focus:outline-none focus:border-[#00f5d4] transition-all"
                         />
@@ -465,7 +465,7 @@ export const OperatorPage: React.FC = () => {
                             type={showPasscode ? 'text' : 'password'}
                             value={passcode}
                             onChange={(e) => setPasscode(e.target.value)}
-                            placeholder="Enter security passkey"
+                            placeholder="••••••••••••"
                             autoComplete="new-password"
                             className="w-full px-4 py-3 pr-11 rounded-xl bg-black/60 border border-white/15 text-sm font-mono text-white focus:outline-none focus:border-[#00f5d4] transition-all"
                           />
@@ -666,17 +666,23 @@ export const OperatorPage: React.FC = () => {
 
                         {/* Miniature Live Scaled Iframe Preview */}
                         <div className="relative w-full aspect-[16/10] bg-[#0C0C0C] overflow-hidden">
+                          {/* Live render pulse indicator behind iframe */}
+                          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0d1117] text-white/30 font-mono text-[10px] select-none">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#00f5d4] animate-ping mb-2" />
+                            <span className="tracking-widest uppercase">Rendering {page.route}</span>
+                          </div>
+
                           <iframe
                             src={page.route}
                             title={`Live snapshot of ${page.title}`}
-                            className="absolute top-0 left-0 border-0 pointer-events-none select-none"
+                            className="absolute top-0 left-0 border-0 pointer-events-none select-none z-10"
                             style={{
                               width: '333.33%',
                               height: '333.33%',
                               transform: 'scale(0.3)',
                               transformOrigin: 'top left',
                             }}
-                            loading="lazy"
+                            loading="eager"
                           />
 
                           {/* Hover Overlay with "OPEN IN VISUAL EDITOR" Action */}

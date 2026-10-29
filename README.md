@@ -131,7 +131,7 @@ Because this portfolio is built as a static Single Page Application (SPA), it ca
 ## 🔒 Security Architecture (RFC 9116 & OWASP)
 - **RFC 9116 Compliance**: Security disclosure policy available at `/.well-known/security.txt`.
 - **Content Security Policy (CSP)**: Strict origin whitelisting restricting untrusted script execution.
-- **Clickjacking Protection**: `X-Frame-Options: DENY` preventing unauthorized iframe embedding.
+- **Clickjacking Protection**: `X-Frame-Options: SAMEORIGIN` and CSP `frame-ancestors 'self'` preventing unauthorized external iframe embedding while allowing internal Operator previews.
 - **MIME Sniffing Prevention**: `X-Content-Type-Options: nosniff`.
 - **Reverse Tabnabbing Safeguards**: All outbound links enforce `rel="noopener noreferrer"`.
 - **Form Sanitization**: Client-side input bounds and encoding on inquiries.
