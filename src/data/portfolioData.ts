@@ -889,7 +889,7 @@ export const PORTFOLIO_DATA = {
     knownActivities: [
       {
         id: 'dc-series',
-        title: 'DC 1–7 Lab Series',
+        title: 'DC 1–9 Lab Series',
         platform: 'Vulnerable-by-Design CTF Lab Series (Authorized Local / Isolated Lab)',
         status: 'Placeholder',
         description:
@@ -986,6 +986,6 @@ export const PORTFOLIO_DATA = {
     'Altrium project screenshots',
     'Altrium demo and repository URLs (if public)',
     'Altrium authorship attribution confirmation',
-    'Specific write-up notes and flags captured for DC 1–7 and CyberSploit labs',
+    'Specific write-up notes and flags captured for DC 1–9 and CyberSploit labs',
   ],
 };

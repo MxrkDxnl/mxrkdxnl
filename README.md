@@ -149,7 +149,7 @@ With GitHub, LinkedIn, social profiles, campus logos, and your official CV PDF n
 2. **Altrium Project Contribution Confirmation**:
    - Confirmation on authorship attribution vs. confirmed Sprint 1 Scrum Master / QA deliverables.
 3. **Cybersecurity Lab Details**:
-   - Specific write-up texts, findings, tools used, and flags captured for the DC 1–7 series and CyberSploit labs to publish beyond draft status.
+   - Specific write-up texts, findings, tools used, and flags captured for the DC 1–9 series and CyberSploit labs to publish beyond draft status.
 
 ---
 

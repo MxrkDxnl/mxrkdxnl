@@ -71,7 +71,7 @@ const PAGE_SNAPSHOTS: PageSnapshot[] = [
     title: 'Security Labs & CTF',
     route: '/labs',
     category: 'Offensive / Defensive Labs',
-    description: 'Vulnerable-by-design CTF series, DC 1-7 writeups, Metasploit, and packet captures.',
+    description: 'Vulnerable-by-design CTF series, DC 1-9 writeups, Metasploit, and packet captures.',
   },
   {
     id: 'contact',
