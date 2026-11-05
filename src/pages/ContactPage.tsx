@@ -1,9 +1,10 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, ArrowUpRight, Download, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Mail, ArrowUpRight, Download, ShieldCheck, CheckCircle2, QrCode } from 'lucide-react';
 import { FadeIn } from '../components/FadeIn';
 import { usePortfolio } from '../context/PortfolioContext';
 import { SocialLogo, InboxLogo } from '../components/ServiceLogos';
+import { QrCodeModal } from '../components/QrCodeModal';
 
 export const ContactPage: React.FC = () => {
   const { data: PORTFOLIO_DATA } = usePortfolio();
@@ -11,6 +12,11 @@ export const ContactPage: React.FC = () => {
   const navigate = useNavigate();
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Social channel whose QR pop-up is open (e.g. Telegram), or null
+  // (kept after closing so the pop-up's content stays put during its exit animation)
+  const [qrSocialName, setQrSocialName] = useState<string | null>(null);
+  const [qrOpen, setQrOpen] = useState(false);
+  const qrSocial = contact.socials.find((s) => s.name === qrSocialName && s.qrImage);
 
   useEffect(() => {
     return () => {
@@ -114,7 +120,7 @@ export const ContactPage: React.FC = () => {
                       </span>
                       <a
                         href={`mailto:${inbox.address}`}
-                        className="text-sm font-medium text-white hover:text-[#BBCCD7] transition-colors truncate block"
+                        className="text-sm font-medium text-white hover:text-[#BBCCD7] transition-colors truncate block py-1.5 -my-1"
                         title={inbox.address}
                       >
                         {inbox.address}
@@ -144,36 +150,66 @@ export const ContactPage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {contact.socials.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#141416] border border-white/10 hover:border-white/30 rounded-2xl p-5 flex flex-col justify-between transition-all group hover:-translate-y-0.5 shadow-md"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <SocialLogo name={social.name} />
-                      <span className="text-[11px] text-white/50 uppercase tracking-wider truncate font-medium">
-                        {social.category}
+              {contact.socials.map((social) => {
+                const cardClass =
+                  'bg-[#141416] border border-white/10 hover:border-white/30 rounded-2xl p-5 flex flex-col justify-between transition-all group hover:-translate-y-0.5 shadow-md text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D7E2EA]';
+                const cardBody = (
+                  <>
+                    <div className="flex items-center justify-between mb-3 w-full">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <SocialLogo name={social.name} />
+                        <span className="text-[11px] text-white/50 uppercase tracking-wider truncate font-medium">
+                          {social.category}
+                        </span>
+                      </div>
+                      {social.qrImage ? (
+                        <QrCode size={15} aria-hidden="true" className="text-white/40 group-hover:text-white transition-colors shrink-0" />
+                      ) : (
+                        <ArrowUpRight
+                          size={15}
+                          aria-hidden="true"
+                          className="text-white/40 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0"
+                        />
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="text-base font-bold text-white group-hover:text-[#BBCCD7] transition-colors">
+                        {social.name}
+                      </h4>
+                      <span className="text-xs text-[#D7E2EA]/70 font-mono truncate block mt-0.5">
+                        {social.handle}
                       </span>
                     </div>
-                    <ArrowUpRight
-                      size={15}
-                      className="text-white/40 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="text-base font-bold text-white group-hover:text-[#BBCCD7] transition-colors">
-                      {social.name}
-                    </h4>
-                    <span className="text-xs text-[#D7E2EA]/70 font-mono truncate block mt-0.5">
-                      {social.handle}
-                    </span>
-                  </div>
-                </a>
-              ))}
+                  </>
+                );
+
+                // Channels with a QR code open a scannable pop-up instead of a new tab
+                return social.qrImage ? (
+                  <button
+                    key={social.name}
+                    type="button"
+                    onClick={() => {
+                      setQrSocialName(social.name);
+                      setQrOpen(true);
+                    }}
+                    aria-haspopup="dialog"
+                    aria-label={`Show ${social.name} QR code for ${social.handle}`}
+                    className={`${cardClass} cursor-pointer`}
+                  >
+                    {cardBody}
+                  </button>
+                ) : (
+                  <a
+                    key={social.name}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cardClass}
+                  >
+                    {cardBody}
+                  </a>
+                );
+              })}
             </div>
           </FadeIn>
         </section>
@@ -214,6 +250,14 @@ export const ContactPage: React.FC = () => {
           </FadeIn>
         </section>
       </div>
+      <QrCodeModal
+        open={qrOpen && Boolean(qrSocial)}
+        onClose={() => setQrOpen(false)}
+        name={qrSocial?.name ?? ''}
+        handle={qrSocial?.handle ?? ''}
+        url={qrSocial?.url ?? ''}
+        qrImage={qrSocial?.qrImage ?? ''}
+      />
     </div>
   );
 };

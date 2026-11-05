@@ -1,8 +1,35 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+
+// Footer carriage (built by scripts/build-footer-carriage.py from the original 1080p video)
+const SOURCE_H = 212; // height of the road strip / sprite images in px
+const SPRITE_ASPECT = 680 / SOURCE_H; // carriage sprite width / height
+const SOURCE_SPEED = 194; // px/s the carriage travels at SOURCE_H scale
+const ENGRAVING_FILTER = 'invert(1) brightness(0.85) contrast(1.15)';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const roadRef = useRef<HTMLDivElement>(null);
+  const carriageRef = useRef<HTMLImageElement>(null);
+
+  // Travel speed must match the hooves in the sprite or the horses look like they're
+  // moonwalking, so the crossing time is derived from the screen width and road height.
+  useEffect(() => {
+    const road = roadRef.current;
+    const carriage = carriageRef.current;
+    if (!road || !carriage) return;
+    const update = () => {
+      const h = road.clientHeight;
+      const spriteW = h * SPRITE_ASPECT;
+      const speed = SOURCE_SPEED * (h / SOURCE_H);
+      const seconds = (road.clientWidth + spriteW) / speed;
+      carriage.style.setProperty('--carriage-duration', `${seconds.toFixed(2)}s`);
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(road);
+    return () => observer.disconnect();
+  }, []);
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -15,8 +42,9 @@ export const Footer: React.FC = () => {
   return (
     <footer
       id="site-footer"
-      className="w-full bg-[#0C0C0C] text-[#D7E2EA] relative overflow-hidden pt-7 sm:pt-9 pb-0 flex flex-col items-center justify-between border-t border-white/10 select-none z-20 mt-auto"
-      style={{ backgroundColor: '#0C0C0C' }}
+      className="w-full bg-black text-[#D7E2EA] relative overflow-hidden pt-7 sm:pt-9 pb-0 flex flex-col items-center justify-between border-t border-white/10 select-none z-20 mt-auto"
+      // Pure black so the engraved road/carriage band (black once inverted) blends in seamlessly
+      style={{ backgroundColor: '#000000' }}
     >
       {/* Centered Compact Content matching site's dark palette */}
       <div className="relative z-10 w-full max-w-2xl mx-auto px-4 sm:px-6 flex flex-col items-center text-center">
@@ -54,24 +82,33 @@ export const Footer: React.FC = () => {
         </p>
       </div>
 
-      {/* Engraved illustration - Sized to normal proportion and centered, locally hosted animated WebP */}
-      <div className="w-full relative mt-2 sm:mt-3 flex justify-center pointer-events-none select-none overflow-hidden">
-        <div className="w-full h-[95px] sm:h-[110px] md:h-[125px] lg:h-[135px] relative overflow-hidden flex items-center justify-center">
-          <picture className="w-full h-full flex items-center justify-center">
-            <source type="image/webp" srcSet="/images/horse-cart.webp" />
-            <img
-              src="/images/horse-cart.webp"
-              alt="Vintage engraved horse-drawn carriage galloping"
-              className="w-full h-full object-contain max-w-[520px] sm:max-w-[650px] md:max-w-[780px]"
-              style={{
-                filter: 'invert(1) brightness(0.85) contrast(1.15)',
-                mixBlendMode: 'screen',
-                opacity: 0.85,
-              }}
-              loading="eager"
-            />
-          </picture>
-        </div>
+      {/* Engraved road spanning the full footer, with the carriage galloping across it
+          from the far left to the far right of the screen */}
+      <div
+        ref={roadRef}
+        aria-hidden="true"
+        className="relative w-full mt-2 sm:mt-3 h-[60px] sm:h-[70px] md:h-[80px] lg:h-[88px] overflow-hidden pointer-events-none select-none"
+        style={{ opacity: 0.85 }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url(/images/footer-road.webp)',
+            backgroundRepeat: 'repeat-x',
+            backgroundSize: 'auto 100%',
+            backgroundPosition: 'left bottom',
+            filter: ENGRAVING_FILTER,
+            mixBlendMode: 'screen',
+          }}
+        />
+        <img
+          ref={carriageRef}
+          src="/images/footer-carriage.webp"
+          alt=""
+          draggable={false}
+          className="footer-carriage absolute bottom-0 left-0 h-full w-auto max-w-none"
+          style={{ filter: ENGRAVING_FILTER }}
+        />
       </div>
     </footer>
   );

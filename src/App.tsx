@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { MotionConfig } from 'framer-motion';
 import { PortfolioProvider } from './context/PortfolioContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ScrollToTop } from './components/ScrollToTop';
+import { CursorDust } from './components/CursorDust';
 import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
 import { ProjectsPage } from './pages/ProjectsPage';
@@ -36,9 +38,12 @@ function GlobalOperatorShortcut() {
 export function App() {
   return (
     <PortfolioProvider>
+      {/* Honour the OS "reduce motion" setting for every Framer Motion animation */}
+      <MotionConfig reducedMotion="user">
       <Router>
         <ScrollToTop />
         <GlobalOperatorShortcut />
+        <CursorDust />
         <div
           style={{ overflowX: 'clip' }}
           className="bg-[#0C0C0C] text-[#D7E2EA] font-sans min-h-screen w-full relative flex flex-col justify-between selection:bg-[#B600A8] selection:text-white"
@@ -65,6 +70,7 @@ export function App() {
           <Footer />
         </div>
       </Router>
+      </MotionConfig>
     </PortfolioProvider>
   );
 }

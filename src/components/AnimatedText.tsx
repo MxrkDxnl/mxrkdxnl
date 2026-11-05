@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
+import { motion, useScroll, useTransform, useReducedMotion, MotionValue } from 'framer-motion';
 
 interface AnimatedTextProps {
   text: string;
@@ -25,12 +25,26 @@ const Character: React.FC<CharacterProps> = ({ char, progress, range }) => {
   );
 };
 
+/**
+ * Character-by-character scroll reveal: each character fades from 0.2 to 1 opacity
+ * as the paragraph scrolls through the viewport. Screen readers get the plain text
+ * once; reduced-motion users get the plain text fully visible.
+ */
 export const AnimatedText: React.FC<AnimatedTextProps> = ({ text, className = '' }) => {
   const containerRef = useRef<HTMLParagraphElement>(null);
+  const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start 0.8', 'end 0.2'],
   });
+
+  if (reduceMotion) {
+    return (
+      <p ref={containerRef} className={className}>
+        {text}
+      </p>
+    );
+  }
 
   const words = text.split(' ');
   const totalChars = text.length;
@@ -38,33 +52,27 @@ export const AnimatedText: React.FC<AnimatedTextProps> = ({ text, className = ''
 
   return (
     <p ref={containerRef} className={className}>
-      {words.map((word, wordIndex) => {
-        const wordChars = word.split('');
-        const wordStartIndex = charCounter;
-        charCounter += word.length + 1; // +1 for the following space
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">
+        {words.map((word, wordIndex) => {
+          const wordChars = word.split('');
+          const wordStartIndex = charCounter;
+          charCounter += word.length + 1; // +1 for the following space
 
-        return (
-          <span key={wordIndex} className="inline-block whitespace-nowrap">
-            {wordChars.map((char, i) => {
-              const globalIndex = wordStartIndex + i;
-              const start = globalIndex / totalChars;
-              const end = Math.min(1, start + (1 / totalChars));
-
-              return (
-                <Character
-                  key={i}
-                  char={char}
-                  progress={scrollYProgress}
-                  range={[start, end]}
-                />
-              );
-            })}
-            {wordIndex < words.length - 1 && (
-              <span className="inline-block">&nbsp;</span>
-            )}
-          </span>
-        );
-      })}
+          return (
+            <span key={wordIndex} className="inline-block whitespace-nowrap">
+              {wordChars.map((char, i) => {
+                const start = (wordStartIndex + i) / totalChars;
+                const end = Math.min(1, start + 1 / totalChars);
+                return (
+                  <Character key={i} char={char} progress={scrollYProgress} range={[start, end]} />
+                );
+              })}
+              {wordIndex < words.length - 1 && <span className="inline-block">&nbsp;</span>}
+            </span>
+          );
+        })}
+      </span>
     </p>
   );
 };

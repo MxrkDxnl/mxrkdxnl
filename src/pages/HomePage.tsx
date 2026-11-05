@@ -3,20 +3,38 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Terminal, Cpu, Network, FileText, CheckCircle2 } from 'lucide-react';
 import { FadeIn } from '../components/FadeIn';
 import { Magnet } from '../components/Magnet';
+import { MarqueeSection } from '../components/MarqueeSection';
+import { AboutSection } from '../components/AboutSection';
+import { ServicesSection } from '../components/ServicesSection';
+import { ProjectsSection } from '../components/ProjectsSection';
 import { usePortfolio } from '../context/PortfolioContext';
-import markPortrait from '../assets/mark-portrait.png';
+import { HeroAvatar } from '../components/HeroAvatar';
 
 export const HomePage: React.FC = () => {
   const { data: PORTFOLIO_DATA } = usePortfolio();
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // The Sri Lanka video is ~29 MB: don't download it until it's about to scroll into
+  // view, and pause it whenever it's off screen (saves data on phones).
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = true;
-      videoRef.current.play().catch(() => {
-        // Fallback if browser requires interaction
-      });
-    }
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (video.preload !== 'auto') video.preload = 'auto';
+          video.play().catch(() => {
+            // Autoplay blocked: the vignette + heading still show over the first frame
+          });
+        } else {
+          video.pause();
+        }
+      },
+      { rootMargin: '300px 0px' }
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
   }, []);
   return (
     <div className="w-full flex flex-col">
@@ -38,20 +56,23 @@ export const HomePage: React.FC = () => {
         </div>
 
         {/* Hero Heading: HI, I'M MARK */}
-        <div className="w-full overflow-hidden flex items-center justify-center z-10 my-auto py-6 sm:py-8">
+        <div className="w-full overflow-hidden flex items-center justify-center z-10 mt-10 mb-2 sm:mt-14 sm:mb-4 xl:my-auto xl:py-8">
           <FadeIn delay={0.15} y={40} amount={0} margin="0px" className="w-full text-center">
-            <h1 className="hero-heading font-black uppercase tracking-tight leading-none w-full text-center text-[11vw] sm:text-[14vw] md:text-[15.5vw] lg:text-[16.5vw] select-none break-normal">
+            <h1 className="hero-heading font-black uppercase tracking-tight leading-none w-full text-center text-[11vw] xl:text-[16.5vw] select-none break-normal">
               {PORTFOLIO_DATA.identity.heroGreeting}
             </h1>
           </FadeIn>
         </div>
 
-        {/* Centered Mark Portrait with Magnet */}
-        <div className="absolute left-1/2 -translate-x-1/2 z-20 w-[270px] sm:w-[390px] md:w-[500px] lg:w-[600px] xl:w-[680px] top-1/2 -translate-y-1/2 sm:top-auto sm:translate-y-0 sm:bottom-0 md:bottom-1 pointer-events-auto">
-          <FadeIn delay={0.3} y={30} amount={0} margin="0px" className="w-full flex justify-center">
+        {/* Mark portrait with Magnet: stacked under the heading on phones and tablets,
+            overlapping the giant heading from the bottom on wide screens (xl+). On wide screens the
+            width is capped by screen height so the avatar never swallows a short laptop screen. */}
+        <div className="relative mx-auto w-[240px] sm:w-[320px] md:w-[380px] lg:w-[400px] z-20 xl:absolute xl:mx-0 xl:left-1/2 xl:-translate-x-1/2 xl:w-[min(680px,56vh)] xl:bottom-1 pointer-events-auto">
+          <FadeIn delay={0.6} y={30} amount={0} margin="0px" className="w-full flex justify-center">
             <Magnet
               padding={150}
               strength={3}
+              followGlobal
               activeTransition="transform 0.3s ease-out"
               inactiveTransition="transform 0.6s ease-in-out"
               className="w-full flex justify-center"
@@ -59,12 +80,7 @@ export const HomePage: React.FC = () => {
               <div className="relative w-full flex justify-center">
                 {/* Subtle backlight glow */}
                 <div className="absolute inset-0 -z-10 rounded-full bg-gradient-to-tr from-[#7621B0]/30 via-[#B600A8]/20 to-transparent blur-3xl transform scale-90" />
-                <img
-                  src={markPortrait}
-                  alt="Mark Daniel - Transparent 3D Avatar"
-                  className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-2xl"
-                  draggable={false}
-                />
+                <HeroAvatar alt="3D avatar of Mark Daniel" />
               </div>
             </Magnet>
           </FadeIn>
@@ -72,7 +88,7 @@ export const HomePage: React.FC = () => {
 
         {/* Bottom Hero Bar */}
         <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 z-20 pt-6">
-          <FadeIn delay={0.4} y={20} amount={0} margin="0px">
+          <FadeIn delay={0.35} y={20} amount={0} margin="0px">
             <p
               style={{ fontSize: 'clamp(0.85rem, 1.4vw, 1.25rem)' }}
               className="text-[#D7E2EA] font-light uppercase tracking-wide leading-snug max-w-[280px] sm:max-w-[320px] md:max-w-[380px]"
@@ -112,52 +128,56 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* VIDEO SECTION - ARRIVES AFTER 3-4 DELIBERATE SCROLLS, EMERGES WITH DRAMATIC CINEMATIC SCALE & BLUR-CLEAR */}
-      <section data-section-id="sec-video" className="w-full px-3 sm:px-4 md:px-6 lg:px-8 pt-20 sm:pt-48 md:pt-60 lg:pt-72 pb-16 sm:pb-40 md:pb-52 bg-[#0C0C0C] border-t border-white/5 relative z-10">
-        <div className="w-full max-w-[1720px] 2xl:max-w-[1920px] mx-auto flex flex-col items-center">
-          <FadeIn
-            delay={0.15}
-            y={80}
-            scale={0.91}
-            blur={14}
-            duration={1.15}
-            amount={0.2}
-            margin="-70px 0px"
-            className="w-full"
-          >
-            <div className="w-full relative aspect-[16/10] sm:aspect-[21/9] md:aspect-[2.38/1] min-h-[280px] sm:min-h-[460px] md:min-h-[540px] lg:min-h-[640px] rounded-[22px] sm:rounded-[40px] md:rounded-[48px] overflow-hidden border border-white/20 shadow-[0_30px_100px_rgba(0,0,0,0.95),0_0_90px_rgba(16,185,129,0.12)] bg-[#0C0C0C] group">
-              {/* Autoplaying, Muted, Looping, Local HTML5 Video - Zero Letterbox Black Bars, True Proportions */}
-              <video
-                ref={videoRef}
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-                src="/sri-lanka-cinematic.mp4"
-                className="absolute inset-0 w-full h-full object-cover scale-[1.36] pointer-events-none select-none transition-transform duration-1000 group-hover:scale-[1.40]"
-              />
+      {/* SCROLL-DRIVEN SCREENSHOT MARQUEE */}
+      <MarqueeSection />
 
-              {/* Cinematic Vignette Overlay to ensure text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/60 pointer-events-none z-10" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.7)_100%)] pointer-events-none z-10" />
+      {/* ABOUT ME: CHARACTER-BY-CHARACTER SCROLL REVEAL */}
+      <AboutSection />
 
-              {/* Text overlay ON the video */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none p-4 sm:p-8 text-center">
-                <FadeIn delay={0.35} y={-20} scale={0.88} duration={0.8} amount={0.25}>
-                  <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/25 text-[10px] sm:text-xs uppercase tracking-widest text-[#BBCCD7] mb-2 sm:mb-5 shadow-2xl">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="font-semibold">Location & Origins</span>
-                  </div>
-                </FadeIn>
-                <FadeIn delay={0.5} y={35} scale={0.94} duration={0.9} amount={0.25}>
-                  <h2 className="text-2xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black uppercase tracking-tight text-white drop-shadow-[0_4px_35px_rgba(0,0,0,0.98)] select-none">
-                    Based in Sri Lanka.
-                  </h2>
-                </FadeIn>
-              </div>
-            </div>
+      {/* VIDEO SECTION - FULL-BLEED, EDGE TO EDGE
+          The file is 16:9 but the actual picture is ~2.34:1 with black bars baked in
+          (rows 0-86 and 634-720 of 720). The section uses the picture's own 2.344:1 shape and the
+          video is sized so those bars sit just outside the frame: on desktop the whole
+          picture shows with no crop and no stretch. On narrow phones the 240px minimum
+          height trims the sides a little instead of shrinking to a thin strip. */}
+      <section data-section-id="sec-video" className="relative z-10 w-full bg-[#0C0C0C]">
+        <div
+          className="relative w-full overflow-hidden"
+          style={{ aspectRatio: '2.344 / 1', minHeight: '240px' }}
+        >
+          <FadeIn delay={0} y={0} duration={1.2} amount={0.15} margin="0px" className="absolute inset-0">
+            <video
+              ref={videoRef}
+              loop
+              muted
+              playsInline
+              preload="none"
+              src="/sri-lanka-cinematic.mp4"
+              aria-hidden="true"
+              className="absolute left-0 w-full object-cover pointer-events-none select-none"
+              style={{ top: '-15.93%', height: '131.87%' }}
+            />
           </FadeIn>
+
+          {/* Light vignette for text readability; soft top/bottom blend into the page */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.15)_0%,rgba(0,0,0,0.45)_100%)] pointer-events-none z-10" />
+          <div className="absolute inset-x-0 top-0 h-[8%] bg-gradient-to-b from-[#0C0C0C] to-transparent pointer-events-none z-10" />
+          <div className="absolute inset-x-0 bottom-0 h-[8%] bg-gradient-to-t from-[#0C0C0C] to-transparent pointer-events-none z-10" />
+
+          {/* Text overlay ON the video */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none p-4 sm:p-8 text-center">
+            <FadeIn delay={0.35} y={-20} scale={0.88} duration={0.8} amount={0.25}>
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/25 text-[10px] sm:text-xs uppercase tracking-widest text-[#BBCCD7] mb-2 sm:mb-5 shadow-2xl">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-semibold">Location & Origins</span>
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.5} y={35} scale={0.94} duration={0.9} amount={0.25}>
+              <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black uppercase tracking-tight text-white drop-shadow-[0_4px_35px_rgba(0,0,0,0.98)] select-none">
+                Based in Sri Lanka.
+              </h2>
+            </FadeIn>
+          </div>
         </div>
       </section>
 
@@ -290,6 +310,12 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* HOW I WORK: WHITE NUMBERED LIST */}
+      <ServicesSection />
+
+      {/* STICKY STACKING PROJECT CARDS */}
+      <ProjectsSection />
+
       {/* 4. FEATURED PROJECT TEASER - ARRIVES AFTER 2-3 SCROLLS, EMERGES WITH HEROIC SCALE & SHADOW */}
       <section data-section-id="sec-featured-project" className="px-4 sm:px-6 md:px-10 py-20 sm:py-44 md:py-56 bg-[#141416] border-t border-b border-white/10">
         <div className="max-w-5xl mx-auto">
@@ -305,9 +331,9 @@ export const HomePage: React.FC = () => {
               </div>
               <Link
                 to="/projects"
-                className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-[#BBCCD7] hover:text-white transition-colors"
+                className="inline-flex items-center gap-2 py-3 min-h-[44px] text-xs uppercase tracking-widest text-[#BBCCD7] hover:text-white transition-colors"
               >
-                <span>View All 6 Projects</span>
+                <span>View All {PORTFOLIO_DATA.projects.length} Projects</span>
                 <ArrowRight size={14} />
               </Link>
             </div>

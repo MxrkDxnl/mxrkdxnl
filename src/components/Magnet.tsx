@@ -9,6 +9,8 @@ interface MagnetProps {
   className?: string;
   style?: React.CSSProperties;
   enableGyro?: boolean;
+  /** Keep turning gently toward the cursor anywhere on screen, not only when it is near. */
+  followGlobal?: boolean;
 }
 
 export const Magnet: React.FC<MagnetProps> = ({
@@ -18,6 +20,7 @@ export const Magnet: React.FC<MagnetProps> = ({
   className = '',
   style,
   enableGyro = true,
+  followGlobal = false,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   
@@ -43,7 +46,7 @@ export const Magnet: React.FC<MagnetProps> = ({
 
       if (ref.current) {
         const { x, y, rotateX, rotateY } = currentPos.current;
-        ref.current.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+        ref.current.style.transform = `perspective(900px) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
       }
 
       animFrameRef.current = requestAnimationFrame(renderLoop);
@@ -160,6 +163,14 @@ export const Magnet: React.FC<MagnetProps> = ({
         targetPos.current.y = dy;
         targetPos.current.rotateY = Math.max(-14, Math.min(14, (dx / 35) * 8));
         targetPos.current.rotateX = Math.max(-12, Math.min(12, -(dy / 35) * 8));
+      } else if (followGlobal) {
+        // Gentle head turn toward the cursor wherever it is on screen
+        const nx = Math.max(-1, Math.min(1, (e.clientX - centerX) / (window.innerWidth / 2)));
+        const ny = Math.max(-1, Math.min(1, (e.clientY - centerY) / (window.innerHeight / 2)));
+        targetPos.current.x = nx * 14;
+        targetPos.current.y = ny * 10;
+        targetPos.current.rotateY = nx * 12;
+        targetPos.current.rotateX = -ny * 9;
       } else {
         targetPos.current.x = 0;
         targetPos.current.y = 0;
@@ -184,7 +195,7 @@ export const Magnet: React.FC<MagnetProps> = ({
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('mouseleave', handlePointerLeave);
     };
-  }, [padding, strength]);
+  }, [padding, strength, followGlobal]);
 
   // Tap avatar directly to recalibrate holding posture & activate iOS gyro prompt
   const handleTapAvatar = () => {

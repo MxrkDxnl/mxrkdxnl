@@ -974,6 +974,14 @@ export const PORTFOLIO_DATA = {
         handle: 'Mxrk.Dxnl.02',
         category: 'Secure Messenger',
       },
+      {
+        name: 'Telegram',
+        url: 'https://t.me/MXRKDXNL',
+        handle: '@MXRKDXNL',
+        category: 'Messenger',
+        // Clicking the card opens a pop-up with this QR code instead of navigating away
+        qrImage: '/images/telegram-qr.webp',
+      },
     ],
     cv: {
       available: true,

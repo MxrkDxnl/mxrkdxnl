@@ -23,11 +23,15 @@ type CmsSection = 'identity' | 'contact' | 'academics' | 'projects' | 'sections'
 const PAGE_DEFAULT_SECTIONS: Record<string, { id: string; name: string }[]> = {
   '/': [
     { id: 'sec-hero', name: "1. Hero Section (HI, I'M MARK & 3D Portrait)" },
-    { id: 'sec-video', name: '2. Cinematic Video (Based in Sri Lanka)' },
-    { id: 'sec-intro', name: '3. Introduction & Focus Profile' },
-    { id: 'sec-learning', name: '4. Current Learning Focus & Skills' },
-    { id: 'sec-featured-project', name: '5. Featured Project Teaser (Altrium Tracker)' },
-    { id: 'sec-labs-preview', name: '6. Cybersecurity Labs & Writeups' },
+    { id: 'sec-marquee', name: '2. Scrolling Screenshot Marquee' },
+    { id: 'sec-about-reveal', name: '3. About Me (Scroll Text Reveal)' },
+    { id: 'sec-video', name: '4. Cinematic Video (Based in Sri Lanka)' },
+    { id: 'sec-intro', name: '5. Introduction & Focus Profile' },
+    { id: 'sec-learning', name: '6. Current Learning Focus & Skills' },
+    { id: 'sec-how-i-work', name: '7. How I Work (Numbered List)' },
+    { id: 'sec-project-stack', name: '8. Stacking Project Cards' },
+    { id: 'sec-featured-project', name: '9. Featured Project Teaser (Altrium Tracker)' },
+    { id: 'sec-labs-preview', name: '10. Cybersecurity Labs & Writeups' },
   ],
   '/about': [
     { id: 'sec-about-profile', name: "1. Profile Overview & Portrait Photo" },

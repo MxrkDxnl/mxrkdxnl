@@ -1,180 +1,213 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import type { MotionValue } from 'framer-motion';
+import { ArrowUpRight, ArrowRight } from 'lucide-react';
 import { FadeIn } from './FadeIn';
-import { LiveProjectButton } from './LiveProjectButton';
+import { usePortfolio } from '../context/PortfolioContext';
+import type { ProjectItem, ProjectScreenshot } from '../data/portfolioData';
 
-interface ProjectData {
-  number: string;
-  name: string;
-  category: string;
-  col1TopImage: string;
-  col1BottomImage: string;
-  col2Image: string;
-  link?: string;
-}
-
-const PROJECTS: ProjectData[] = [
-  {
-    number: '01',
-    name: 'Nextlevel Studio',
-    category: '(Client)',
-    col1TopImage:
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055344_5eff02e0-87a5-41ce-b64f-eb08da8f33db.png&w=1280&q=85',
-    col1BottomImage:
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055431_11d841fd-8b41-46a5-82e4-b04f2407a7d8.png&w=1280&q=85',
-    col2Image:
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055451_e317bf2d-28d4-48cc-86b0-6f72f25b6327.png&w=1280&q=85',
-    link: '#',
-  },
-  {
-    number: '02',
-    name: 'Aura Brand Identity',
-    category: '(Personal)',
-    col1TopImage:
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055654_911201c5-36d9-4bc6-bac7-331adfce159f.png&w=1280&q=85',
-    col1BottomImage:
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055723_5ceda0b8-d9c2-4665-b2e3-83ba19ba76d1.png&w=1280&q=85',
-    col2Image:
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055753_adc5dcbd-a8e6-49c0-b43a-9b030d835cea.png&w=1280&q=85',
-    link: '#',
-  },
-  {
-    number: '03',
-    name: 'Solaris Digital',
-    category: '(Client)',
-    col1TopImage:
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055759_963cfb0b-4bd1-4b0f-9d0a-09bd6cf95b2f.png&w=1280&q=85',
-    col1BottomImage:
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_060108_438f781a-9846-4dcc-89ab-c4e6cb830f5b.png&w=1280&q=85',
-    col2Image:
-      'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055818_9d062121-ad7e-46b9-999a-1a6a692ef1ee.png&w=1280&q=85',
-    link: '#',
-  },
+// Projects shown in the stack, in order. Everything else is behind "View remaining".
+const STACK_SLUGS = [
+  'ticketmaster-breach-analysis',
+  'wireshark-network-analysis',
+  'cs-vulnerabilities-countermeasures',
+  'medsys-cloud-architecture',
+  'ceylon-reads-database-design',
 ];
 
+const CARD_OFFSET_PX = 18; // how far each card sits below the previous one in the stack
+const IMAGE_RADIUS = 'rounded-[24px] sm:rounded-[36px] md:rounded-[44px]';
+
+// Layout shared by the pinned heading and the pinned cards.
+const NAV_HEIGHT = '5rem'; // fixed navbar (h-20)
+const HEADING_SIZE = 'clamp(3.5rem, 7vw, 7rem)'; // "Projects" font size (leading-none → same height)
+const HEADING_GAP = '1rem'; // space between heading and the stack
+const CARD_TOP = `calc(${NAV_HEIGHT} + ${HEADING_SIZE} + ${HEADING_GAP})`;
+
+// Image heights follow screen height as well as width so the stack fits on laptops
+const TOP_IMG_H = 'clamp(90px, min(10vw, 16dvh), 230px)';
+const BOTTOM_IMG_H = 'clamp(110px, min(14vw, 22dvh), 320px)';
+
+const Shot: React.FC<{ shot: ProjectScreenshot; className?: string; style?: React.CSSProperties }> = ({
+  shot,
+  className = '',
+  style,
+}) => (
+  <div style={style} className={`relative w-full overflow-hidden bg-white border border-white/5 ${IMAGE_RADIUS} ${className}`}>
+    <img
+      src={shot.image}
+      alt={shot.title}
+      loading="lazy"
+      decoding="async"
+      className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 hover:scale-105"
+    />
+  </div>
+);
+
 interface ProjectCardProps {
-  project: ProjectData;
+  project: ProjectItem;
   index: number;
   totalCards: number;
+  progress: MotionValue<number>;
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, totalCards }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end start'],
-  });
+/**
+ * Each card lives in its own full-height sticky slot. All slots share one parent,
+ * so earlier cards stay pinned while later cards slide up and cover them.
+ */
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, totalCards, progress }) => {
+  const reduceMotion = useReducedMotion();
 
-  // Scale calculation: targetScale = 1 - (totalCards - 1 - index) * 0.03
+  // Shrink this card while the cards after it slide over it.
   const targetScale = 1 - (totalCards - 1 - index) * 0.03;
-  const scale = useTransform(scrollYProgress, [0, 1], [1, targetScale]);
+  const scale = useTransform(progress, [index / totalCards, 1], [1, targetScale]);
 
-  const topOffset = index * 28;
+  const shots = project.screenshots ?? [];
+  const hasGrid = shots.length >= 3;
 
   return (
-    <div
-      ref={containerRef}
-      className="h-[85vh] sm:h-[88vh] md:h-[92vh] flex items-start justify-center relative mb-8 sm:mb-12"
-    >
-      <motion.div
+    <div className="sticky top-0 h-[100dvh] flex items-start justify-center" style={{ paddingTop: CARD_TOP }}>
+      <motion.article
         style={{
-          scale,
-          top: `calc(5rem + ${topOffset}px)`,
+          scale: reduceMotion ? 1 : scale,
+          top: index * CARD_OFFSET_PX,
         }}
-        className="sticky w-full max-w-6xl rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-6 md:p-8 shadow-2xl origin-top"
+        className="relative w-full max-w-6xl rounded-[32px] sm:rounded-[44px] md:rounded-[56px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-6 md:p-7 shadow-[0_-20px_60px_rgba(0,0,0,0.7)] origin-top"
       >
-        {/* Top row */}
-        <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-6 pb-4 sm:pb-6 border-b border-white/10">
-          <div className="flex items-baseline gap-3 sm:gap-6 flex-wrap">
+        {/* Top row: number, module, name, case-study button */}
+        <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-6 pb-4 sm:pb-5 border-b border-white/10">
+          <div className="flex items-baseline gap-3 sm:gap-5 flex-wrap min-w-0 flex-1">
             <span
-              style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)' }}
+              aria-hidden="true"
+              style={{ fontSize: 'clamp(2.25rem, 4.5vw, 4rem)' }}
               className="font-black text-[#D7E2EA] leading-none select-none tracking-tight"
             >
-              {project.number}
+              {String(index + 1).padStart(2, '0')}
             </span>
-            <span className="text-[#D7E2EA]/70 uppercase tracking-wider text-xs sm:text-sm md:text-base font-light">
-              {project.category}
+            <span className="text-[#D7E2EA]/70 uppercase tracking-wider text-xs sm:text-sm font-light">
+              ({project.moduleCode ?? project.category})
             </span>
-            <h3 className="text-[#D7E2EA] font-medium uppercase tracking-wide text-base sm:text-xl md:text-2xl lg:text-3xl">
+            <h3 className="basis-full text-[#D7E2EA] font-medium uppercase tracking-wide text-sm sm:text-lg md:text-2xl leading-snug min-w-0">
               {project.name}
             </h3>
           </div>
 
-          <div>
-            <LiveProjectButton href={project.link} />
-          </div>
+          <Link
+            to={`/projects/${project.slug}`}
+            className="rounded-full border-2 border-[#D7E2EA] text-[#D7E2EA] font-medium uppercase tracking-widest px-5 py-2.5 sm:px-8 sm:py-3 text-xs sm:text-sm hover:bg-[#D7E2EA]/10 transition-colors duration-200 inline-flex items-center justify-center gap-2 shrink-0 min-h-[44px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D7E2EA]"
+          >
+            <span>Case Study</span>
+            <ArrowUpRight size={16} aria-hidden="true" />
+          </Link>
         </div>
 
-        {/* Bottom row: Two-column image grid */}
-        <div className="flex flex-col md:flex-row gap-4 sm:gap-6 mt-4 sm:mt-6">
-          {/* Left Column (40% width): 2 stacked images */}
-          <div className="w-full md:w-[40%] flex flex-col gap-4 sm:gap-6">
-            <div
-              style={{ height: 'clamp(130px, 16vw, 230px)' }}
-              className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] overflow-hidden bg-[#18181b] border border-white/5"
-            >
-              <img
-                src={project.col1TopImage}
-                alt={`${project.name} preview 1`}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-            <div
-              style={{ height: 'clamp(160px, 22vw, 340px)' }}
-              className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] overflow-hidden bg-[#18181b] border border-white/5"
-            >
-              <img
-                src={project.col1BottomImage}
-                alt={`${project.name} preview 2`}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-          </div>
+        {/* Mobile: one image keeps the card inside the viewport */}
+        <Shot shot={shots[hasGrid ? 2 : 0]} className="md:hidden mt-4 h-[clamp(180px,34dvh,300px)]" />
 
-          {/* Right Column (60% width): 1 tall image */}
-          <div className="w-full md:w-[60%] rounded-[40px] sm:rounded-[50px] md:rounded-[60px] overflow-hidden bg-[#18181b] border border-white/5 min-h-[260px] sm:min-h-[340px] md:min-h-[auto]">
-            <img
-              src={project.col2Image}
-              alt={`${project.name} showcase`}
-              loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-            />
+        {/* md+: 40/60 grid, or one wide image when the project has fewer screenshots */}
+        {hasGrid ? (
+          <div className="hidden md:flex gap-5 mt-5">
+            <div className="w-[40%] flex flex-col gap-5">
+              <Shot shot={shots[0]} style={{ height: TOP_IMG_H }} />
+              <Shot shot={shots[1]} style={{ height: BOTTOM_IMG_H }} />
+            </div>
+            <Shot shot={shots[2]} className="w-[60%]" />
           </div>
-        </div>
-      </motion.div>
+        ) : (
+          <Shot
+            shot={shots[0]}
+            className="hidden md:block mt-5"
+            style={{ height: `calc(${TOP_IMG_H} + ${BOTTOM_IMG_H} + 1.25rem)` }}
+          />
+        )}
+      </motion.article>
     </div>
   );
 };
 
 export const ProjectsSection: React.FC = () => {
+  const { data } = usePortfolio();
+  const stackRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: stackRef,
+    offset: ['start start', 'end end'],
+  });
+
+  // Once the last card has scrolled up past the pinned heading, slide the heading off
+  // to the right so it doesn't hang over the next section. Reverses when scrolling back up.
+  const reduceMotion = useReducedMotion();
+  const { scrollYProgress: exitProgress } = useScroll({
+    target: stackRef,
+    offset: ['end 0.6', 'end 0.2'],
+  });
+  const headingX = useTransform(exitProgress, [0, 1], ['0vw', '110vw']);
+  const headingOpacity = useTransform(exitProgress, [0, 0.7, 1], [1, 0.6, 0]);
+
+  const projects = STACK_SLUGS.map((slug) => data.projects.find((p) => p.slug === slug)).filter(
+    (p): p is ProjectItem => Boolean(p && p.screenshots && p.screenshots.length > 0)
+  );
+  const remaining = data.projects.length - projects.length;
+
+  if (projects.length === 0) return null;
+
   return (
     <section
-      id="projects"
-      className="bg-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 z-10 relative px-5 sm:px-8 md:px-10 pt-20 sm:pt-24 md:pt-32 pb-24 sm:pb-36"
+      data-section-id="sec-project-stack"
+      className="bg-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 z-10 relative px-5 sm:px-8 md:px-10 pt-20 sm:pt-24 md:pt-32 pb-16 sm:pb-24"
     >
-      {/* Heading: Project (singular) using .hero-heading gradient */}
-      <FadeIn delay={0} y={30} className="w-full text-center mb-16 sm:mb-20 md:mb-28">
-        <h2
-          style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
-          className="hero-heading font-black uppercase leading-none tracking-tight text-center select-none"
-        >
-          Project
-        </h2>
-      </FadeIn>
+      {/* Pinned heading: stays under the navbar while the cards stack beneath it */}
+      <motion.div
+        className="sticky z-20 -mx-5 sm:-mx-8 md:-mx-10 px-5 sm:px-8 md:px-10 bg-[#0C0C0C] will-change-transform"
+        style={{
+          top: NAV_HEIGHT,
+          paddingBottom: HEADING_GAP,
+          x: reduceMotion ? 0 : headingX,
+          opacity: headingOpacity,
+        }}
+      >
+        <FadeIn delay={0} y={30} className="w-full text-center">
+          <h2
+            style={{ fontSize: HEADING_SIZE }}
+            className="hero-heading font-black uppercase leading-none tracking-tight text-center select-none"
+          >
+            Projects
+          </h2>
+        </FadeIn>
+      </motion.div>
 
-      {/* 3 Sticky Stacking Project Cards */}
-      <div className="w-full max-w-6xl mx-auto flex flex-col">
-        {PROJECTS.map((project, index) => (
+      {/* One shared parent: every sticky slot stays pinned until this container ends */}
+      {/* Negative margin cancels the slot's top padding so card 01 sits right under the
+          heading in normal flow too; heading and card 01 then pin at the same moment. */}
+      <div
+        ref={stackRef}
+        className="relative w-full max-w-6xl mx-auto"
+        style={{ marginTop: `calc(-1 * ${CARD_TOP})` }}
+      >
+        {projects.map((project, index) => (
           <ProjectCard
-            key={project.number}
+            key={project.id}
             project={project}
             index={index}
-            totalCards={PROJECTS.length}
+            totalCards={projects.length}
+            progress={scrollYProgress}
           />
         ))}
       </div>
+
+      {remaining > 0 && (
+        <FadeIn delay={0} y={20} className="mt-12 sm:mt-16 flex justify-center">
+          <Link
+            to="/projects"
+            className="group inline-flex items-center gap-3 rounded-full border-2 border-[#D7E2EA] text-[#D7E2EA] font-medium uppercase tracking-widest px-8 py-3.5 sm:px-10 sm:py-4 text-xs sm:text-sm hover:bg-[#D7E2EA]/10 transition-colors min-h-[44px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D7E2EA]"
+          >
+            <span>
+              View remaining {remaining} project{remaining === 1 ? '' : 's'}
+            </span>
+            <ArrowRight size={16} aria-hidden="true" className="transition-transform group-hover:translate-x-1" />
+          </Link>
+        </FadeIn>
+      )}
     </section>
   );
 };

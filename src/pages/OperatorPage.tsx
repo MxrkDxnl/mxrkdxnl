@@ -472,8 +472,7 @@ export const OperatorPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setShowPasscode(!showPasscode)}
-                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
-                            tabIndex={-1}
+                            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-lg text-white/40 hover:text-white transition-colors"
                             aria-label={showPasscode ? 'Hide passkey' : 'Show passkey'}
                           >
                             {showPasscode ? <EyeOff size={16} /> : <Eye size={16} />}
